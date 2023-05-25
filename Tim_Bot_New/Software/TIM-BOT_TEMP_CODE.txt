@@ -1,0 +1,84 @@
+//#include <WiFi.h>        //built in WiFi library for ESP32
+
+const char* ssid = "TIM-BOT";
+const char* password = "--PASSWORD--";
+
+//INPUTS
+#define PUSHBUTTON 34
+#define MIC 35
+//OUTPUTS
+#define LED 16
+#define SPEAKER 17
+#define BUZZER 27
+
+//Different states of state machine
+enum State {IDLE, CONNECT, EXECUTE};
+State currentState = IDLE;
+
+void setup() {
+  // Initialize hardware and setup communication
+  Serial.begin(115200);
+  delay(1000);
+ // WiFi.begin(ssid, password);     //attempts to connect wifi
+  //while (WiFi.status() != WL_CONNECTED) {   //checks for connection until it gets connected
+   // Serial.println("Connecting to WiFi...");
+   // delay(1000);
+  }
+  //Serial.println("Connected to WiFi");
+ // pinMode(PUSHBUTTON, INPUT);
+ // pinMode(MIC, INPUT);
+  //pinMode(LED, OUTPUT);
+  //pinMode(SPEAKER, OUTPUT);
+  //pinMode(BUZZER, OUTPUT);
+       char input_buffer[256];
+        int message = 0;
+
+void loop() {
+  switch(currentState) {   // Use a switch statement to handle the different states of the state machine
+    case IDLE:
+      // Wait for messages received in com port
+      if (Serial.available()) {
+        // Get the new byte:
+        //char input_buffer[256];
+        //int message = 0;
+        while (Serial.available() > 0) {
+          input_buffer[message++] = Serial.read();
+        }
+        input_buffer[message] = '\0';  // Terminate the string
+        currentState = CONNECT;  // If messages are received, set status to connect state
+      }
+      // If not, stay in idle state and keep the controller in sleep mode
+      break;
+    case CONNECT:   // Establish connection to device
+      if (connectionEstablished()) {
+        currentState = EXECUTE;
+      }
+      else {
+        Serial.println("Failed to connect to server");
+        currentState = IDLE; 
+      }
+      break;
+    case EXECUTE:  // Execute commands on device
+      if (executionComplete()) {
+        Serial.println("Execution complete");
+        currentState = IDLE;  // Transition to idle state
+      }
+      break;
+    default:
+      Serial.println("Unknown state, returning to idle");
+      currentState = IDLE;   // Default to idle state if unknown state encountered
+      break;
+  }
+}
+
+bool connectionEstablished() {
+  // Check if connection has been established with device
+  // This function is not implemented in the code you provided
+  return true;  // Return true for now to simulate successful connection
+}
+
+bool executionComplete() {
+  // Check if execution of commands is complete
+  // This function is not implemented in the code you provided
+  return true;  // Return true for now to simulate completion of execution
+}
