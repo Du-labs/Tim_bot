@@ -1,0 +1,83 @@
+
+//  ****  WHEN  BUTTON_PUSH   THEN    PLAY_MUSIC  ####
+    //****  Ox01  Ox0C          Ox02    Ox08        ####
+ 
+//   ****  WHEN   RAINING   THEN   BUZZER_ON #### 
+  // ****  0X01   0X09      0X02   0X04      #### 
+
+ //  ****  WHEN   5:00AM  BUZZER_ON   ####
+ //  ****  Ox01   0x0D    Ox04        ####
+ 
+
+unsigned char raw_data[100] = "****010C0208####****01090204####****010D04####";
+unsigned char input_message[30][50];
+unsigned char index = 0, data_index = 0, message_index = 0, message_count = 0;
+
+void setup()
+{
+  Serial.begin(9600);
+}
+
+void loop()
+{
+  while (index < 100)
+  {
+    if (raw_data[index] == '*' && raw_data[index + 1] == '*' && raw_data[index + 2] == '*' && raw_data[index + 3] == '*')
+    {
+      {
+      Serial.println("Received commands");
+      data_index = index + 4;
+    }
+   /* else
+    {
+      index++; // Keep incrementing until **** is received
+      Serial.println("Error: No commands received");
+    }
+*/
+    // Start extracting message until ####
+    while (raw_data[data_index] != '#')
+    {
+      input_message[message_count][message_index] = raw_data[data_index];
+      message_index++; // Increment message_index to extract message
+      data_index++;    // Increment data_index to extract message
+      index = data_index;
+      index++;
+      //Serial.println(raw_data[message_index]);
+
+      if (raw_data[data_index] == '#') // Check if the raw data has #
+      {
+        // If # is found, check if it has 3 more #
+        if (raw_data[data_index + 1] == '#' && raw_data[data_index + 2] == '#' && raw_data[data_index + 3] == '#')
+        {
+          data_index = data_index + 4;
+        }
+      }
+    
+    
+   
+
+    message_count++;
+    
+    }
+
+  // Display the numbers in input_message array
+  Serial.println("Numbers in input_message array:");
+  for (unsigned char i = 0; i < message_count; i++)
+  {
+    Serial.print("Message ");
+    Serial.print(i + 1);
+    Serial.print(": ");
+     Serial.println( raw_data[data_index]);
+   
+    // Serial.println("End of commands");
+   
+  }
+    }
+   else
+    {
+      index++; // Keep incrementing until **** is received
+      Serial.println("Error: No commands received");
+    }
+
+}
+}
